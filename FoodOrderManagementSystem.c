@@ -443,6 +443,37 @@ void adminmenu(){
 
     }
 }
-void deleteFoodItem(){
-    printf("Deleted success fully");
+void deleteFoodItem() {
+    int id;
+    printf("Enter the ID of the food item to delete: ");
+    scanf("%d", &id);
+
+    FILE *tempFile = fopen("temp.dat", "wb");
+    file = fopen("foodItem.dat", "rb");
+    if (file == NULL || tempFile == NULL) {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    int found = 0;
+    while (fread(&food, sizeof(foodItem), 1, file)) {
+        if (food.itemId == id) {
+            found = 1; // Skip writing this item to temp file
+            printf("Food item with ID %d deleted successfully!\n", id);
+        } else {
+            fwrite(&food, sizeof(foodItem), 1, tempFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (!found) {
+        printf("Food item with ID %d not found!\n", id);
+    }
+
+    // Rename temp file to original file
+    remove("foodItem.dat");
+    rename("temp.dat", "foodItem.dat");
 }
+
